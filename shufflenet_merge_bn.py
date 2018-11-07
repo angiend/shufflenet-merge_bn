@@ -19,7 +19,7 @@ def load_and_fill_biases(src_model, src_weights, dst_model, dst_weights):
         pb.text_format.Merge(f.read(), model)
  
     for i, layer in enumerate(model.layer):
-        if layer.type == 'Convolution': # or layer.type == 'Scale':
+        if layer.type == 'Convolution' or layer.type == 'ConvolutionDepthwise':
             # Add bias layer if needed
             if layer.convolution_param.bias_term == False:
                 layer.convolution_param.bias_term = True
@@ -110,7 +110,7 @@ def merge_batchnorms_in_net(net):
         for j in xrange(i - 1, -1, -1):
             tops_of_j = net.top_names[net._layer_names[j]]
             if l_bottom in tops_of_j:
-                if net.layers[j].type not in ['Convolution', 'InnerProduct']:
+                if net.layers[j].type not in ['Convolution', 'InnerProduct','ConvolutionDepthwise']:
                     can_be_absorbed = False
                 else:
                     # There must be only one layer
